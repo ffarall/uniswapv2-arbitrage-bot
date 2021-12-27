@@ -1,0 +1,22 @@
+{
+  "name": "uniswapv2-arbitrage-bot",
+  "version": "1.0.0",
+  "description": "Simple cryptocurrency arbitrage bot working with Uniswap V2 DEX.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ffarall/uniswapv2-arbitrage-bot.git"
+  },
+  "author": "Facundo David Farall",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ffarall/uniswapv2-arbitrage-bot/issues"
+  },
+  "homepage": "https://github.com/ffarall/uniswapv2-arbitrage-bot#readme",
+  "dependencies": {
+    "@uniswap/sdk": "^3.0.3"
+  }
+}
