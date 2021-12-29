@@ -18,6 +18,7 @@
   "homepage": "https://github.com/ffarall/uniswapv2-arbitrage-bot#readme",
   "dependencies": {
     "@uniswap/sdk": "^3.0.3",
+    "cluster": "^0.7.7",
     "ethers": "^5.5.2",
     "fs": "^0.0.1-security"
   }

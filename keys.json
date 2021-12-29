@@ -1,0 +1,6 @@
+{
+    "wssInfuraEndpoint": "wss://mainnet.infura.io/ws/v3/e87568d201a14fbf87da96b3ac436ccf",
+    "httpsInfuraEndpoint": "https://mainnet.infura.io/v3/e87568d201a14fbf87da96b3ac436ccf",
+    "wssAnkrEndpoint": "wss://apis-sj.ankr.com/wss/d8f700f3837142c18aa2bac7028ee20c/4bafa571f73b4a64563a8cdbff4eca27/eth/fast/main",
+    "httpsAnkrEndpoint": "https://apis-sj.ankr.com/d8f700f3837142c18aa2bac7028ee20c/4bafa571f73b4a64563a8cdbff4eca27/eth/fast/main"
+}
