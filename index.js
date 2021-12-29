@@ -18,10 +18,11 @@ const chainId = ChainId.MAINNET;
 // *************************************************************
 // *                        CODE
 // *************************************************************
+const provider = new ethers.providers.WebSocketProvider(keys.wssInfuraEndpoint);
+
 const init = async (tokensJson) => {
     let tokens = {};
     let routes = [];
-    const provider = new ethers.providers.JsonRpcProvider(keys.httpsInfuraEndpoint);
 
     for (const [token, address] of Object.entries(tokensJson)) {
         tokens[token] = await Fetcher.fetchTokenData(chainId, address, provider);
@@ -30,7 +31,7 @@ const init = async (tokensJson) => {
     // After I am sure that all tokens have been fetched...
     for (const token in tokens) {
         // Adding route from USDC to token.
-        if (token != "USDC") {ß
+        if (token != "USDC") {
             const pair = await Fetcher.fetchPairData(tokens["USDC"], tokens[token], provider);
             const route = new Route([pair], tokens["USDC"]);
             routes.push({
@@ -57,4 +58,6 @@ init(tokensJson).then(response => {
     for (const route in response) {
         console.log(response[route]["tokens"], response[route]["route"].midPrice.toSignificant(6));
     }
+
+    provider.destroy();
 });
