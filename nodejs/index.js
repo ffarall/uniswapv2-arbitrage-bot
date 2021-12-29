@@ -1,7 +1,7 @@
 // *************************************************************
 // *                        REQUIRES
 // *************************************************************
-const {ChainId, Fetcher, Route} = require("@uniswap/sdk");
+const {ChainId, Fetcher, Route, Trade, TokenAmount, TradeType, Token} = require("@uniswap/sdk");
 const {ethers} = require("ethers");
 
 const tokensJson = require("./tokens.json");
@@ -61,17 +61,30 @@ const getRoutes = async (tokensJson) => {
     return routes;
 }
 
+const estimateSlippageForTrade = (route, tokenAmount, tradeType) => {
+    const trade = new Trade(route, new TokenAmount(route.input, tokenAmount), tradeType);
+    return (route.midPrice.toSignificant(6) - trade.executionPrice.toSignificant(6));
+}
+
 
 // *************************************************************
 // *                          MAIN
 // *************************************************************
 const main = async () => {
+    let routes = [];
+
     await getRoutes(tokensJson).then(response => {
         for (const route in response) {
-            console.log(response[route]["tokens"], response[route]["route"].midPrice.toSignificant(6));
+            console.log(route, response[route]["tokens"], response[route]["route"].midPrice.toSignificant(6));
         }
+
+        routes = response;
     });
     
+    const inTokenAmount = "1000000000000000000000";
+    const slippage = estimateSlippageForTrade(routes[30]["route"], inTokenAmount, TradeType.EXACT_INPUT);
+    console.log(`The slippage for a trade between tokens ${routes[30]["tokens"]}, with an amount of ${inTokenAmount} ${routes[30]["tokens"][0]} is: ${slippage} ${routes[30]["tokens"][1]}.`)
+
     provider.destroy();
 }
 
