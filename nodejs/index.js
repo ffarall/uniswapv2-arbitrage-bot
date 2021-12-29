@@ -3,7 +3,6 @@
 // *************************************************************
 const {ChainId, Fetcher, Route} = require("@uniswap/sdk");
 const {ethers} = require("ethers");
-const {Address} = require("cluster");
 
 const tokensJson = require("./tokens.json");
 const keys = require("./keys.json");
@@ -16,11 +15,11 @@ const chainId = ChainId.MAINNET;
 
 
 // *************************************************************
-// *                        CODE
+// *                       METHODS
 // *************************************************************
 const provider = new ethers.providers.WebSocketProvider(keys.wssInfuraEndpoint);
 
-const init = async (tokensJson) => {
+const getRoutes = async (tokensJson) => {
     let tokens = {};
     let routes = [];
 
@@ -34,18 +33,26 @@ const init = async (tokensJson) => {
         if (token != "USDC") {
             const pair = await Fetcher.fetchPairData(tokens["USDC"], tokens[token], provider);
             const route = new Route([pair], tokens["USDC"]);
+            const inv_route = new Route([pair], tokens[token]);
             routes.push({
                 "route": route,
                 "tokens": ["USDC", token]
+            }, {
+                "route": inv_route,
+                "tokens": [token, "USDC"]
             });
 
             // Adding route from WETH to token.
             if (token != "WETH") {
                 const pair = await Fetcher.fetchPairData(tokens["WETH"], tokens[token], provider);
                 const route = new Route([pair], tokens["WETH"]);
+                const inv_route = new Route([pair], tokens[token]);
                 routes.push({
                     "route": route,
                     "tokens": ["WETH", token]
+                }, {
+                    "route": inv_route,
+                    "tokens": [token, "WETH"]
                 });
             }
         }
@@ -55,8 +62,11 @@ const init = async (tokensJson) => {
 }
 
 
+// *************************************************************
+// *                          MAIN
+// *************************************************************
 const main = async () => {
-    await init(tokensJson).then(response => {
+    await getRoutes(tokensJson).then(response => {
         for (const route in response) {
             console.log(response[route]["tokens"], response[route]["route"].midPrice.toSignificant(6));
         }
