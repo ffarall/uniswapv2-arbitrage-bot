@@ -54,10 +54,16 @@ const init = async (tokensJson) => {
     return routes;
 }
 
-init(tokensJson).then(response => {
-    for (const route in response) {
-        console.log(response[route]["tokens"], response[route]["route"].midPrice.toSignificant(6));
-    }
 
+const main = async () => {
+    await init(tokensJson).then(response => {
+        for (const route in response) {
+            console.log(response[route]["tokens"], response[route]["route"].midPrice.toSignificant(6));
+        }
+    });
+    
     provider.destroy();
-});
+}
+
+
+main();
