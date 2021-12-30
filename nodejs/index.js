@@ -6,6 +6,7 @@ const {ethers} = require("ethers");
 
 const tokensJson = require("./tokens.json");
 const keys = require("./keys.json");
+const Grapher = require("./grapher.js");
 
 
 // *************************************************************
@@ -83,7 +84,11 @@ const main = async () => {
     
     const inTokenAmount = "1000000000000000000000";
     const slippage = estimateSlippageForTrade(routes[30]["route"], inTokenAmount, TradeType.EXACT_INPUT);
-    console.log(`The slippage for a trade between tokens ${routes[30]["tokens"]}, with an amount of ${inTokenAmount} ${routes[30]["tokens"][0]} is: ${slippage} ${routes[30]["tokens"][1]}.`)
+    console.log(`The slippage for a trade between tokens ${routes[30]["tokens"]}, with an amount of ${inTokenAmount} ${routes[30]["tokens"][0]} is: ${slippage} ${routes[30]["tokens"][1]}.`);
+
+    let grapher = new Grapher();
+    grapher.populateCryptoGraph(routes, Object.keys(tokensJson));
+    grapher.detectArbitrage();
 
     provider.destroy();
 }
