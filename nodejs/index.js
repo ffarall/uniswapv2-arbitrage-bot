@@ -6,13 +6,13 @@ const {ethers} = require("ethers");
 
 const tokensJson = require("./tokens.json");
 const keys = require("./keys.json");
-const Grapher = require("./grapher.js");
+const UniswapGraph = require("./grapher.js");
 
 
 // *************************************************************
 // *                      CONSTANTS
 // *************************************************************
-const chainId = ChainId.MAINNET;
+const CHAIN_ID = ChainId.MAINNET;
 
 
 // *************************************************************
@@ -25,36 +25,23 @@ const getRoutes = async (tokensJson) => {
     let routes = [];
 
     for (const [token, address] of Object.entries(tokensJson)) {
-        tokens[token] = await Fetcher.fetchTokenData(chainId, address, provider);
+        tokens[token] = await Fetcher.fetchTokenData(CHAIN_ID, address, provider);
     }
 
     // After I am sure that all tokens have been fetched...
-    for (const token in tokens) {
-        // Adding route from USDC to token.
-        if (token != "USDC") {
-            const pair = await Fetcher.fetchPairData(tokens["USDC"], tokens[token], provider);
-            const route = new Route([pair], tokens["USDC"]);
-            const inv_route = new Route([pair], tokens[token]);
-            routes.push({
-                "route": route,
-                "tokens": ["USDC", token]
-            }, {
-                "route": inv_route,
-                "tokens": [token, "USDC"]
-            });
-
-            // Adding route from WETH to token.
-            if (token != "WETH") {
-                const pair = await Fetcher.fetchPairData(tokens["WETH"], tokens[token], provider);
-                const route = new Route([pair], tokens["WETH"]);
-                const inv_route = new Route([pair], tokens[token]);
+    for (const tokenStart in tokens) {
+        for (const tokenEnd in tokens) {
+            try {
+                const pair = await Fetcher.fetchPairData(tokens[tokenStart], tokens[tokenEnd], provider);
+                const route = new Route([pair], tokens[tokenStart]);
+    
                 routes.push({
                     "route": route,
-                    "tokens": ["WETH", token]
-                }, {
-                    "route": inv_route,
-                    "tokens": [token, "WETH"]
+                    "tokens": [tokenStart, tokenEnd]
                 });
+
+            } catch (error) {
+                // Pair does not exist.
             }
         }
     }
@@ -76,6 +63,7 @@ const main = async () => {
 
     await getRoutes(tokensJson).then(response => {
         for (const route in response) {
+            // Printing pairs that the bot works with (only the first run)
             console.log(route, response[route]["tokens"], response[route]["route"].midPrice.toSignificant(6));
         }
 
@@ -86,9 +74,8 @@ const main = async () => {
     const slippage = estimateSlippageForTrade(routes[30]["route"], inTokenAmount, TradeType.EXACT_INPUT);
     console.log(`The slippage for a trade between tokens ${routes[30]["tokens"]}, with an amount of ${inTokenAmount} ${routes[30]["tokens"][0]} is: ${slippage} ${routes[30]["tokens"][1]}.`);
 
-    let grapher = new Grapher();
-    grapher.populateCryptoGraph(routes, Object.keys(tokensJson));
-    grapher.detectArbitrage();
+    let grapher = new UniswapGraph(Object.keys(tokensJson), routes);
+    grapher.detectArbitrage("USDT");
 
     provider.destroy();
 }

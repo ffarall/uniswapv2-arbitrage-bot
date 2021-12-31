@@ -1,59 +1,93 @@
-const jsgraphs = require("js-graph-algorithms");
+class Edge {
+    constructor(from, to, weight)
+    {
+        this.src = from;
+        this.dest = to;
+        this.weight = weight;
+    }
+}
 
-class Grapher {
+// Class to represent a directed and weighted graph
+class UniswapGraph {
+    constructor(vertexes, routes) {
+        this.populate(vertexes, routes);
+    }
 
-    graph;
-
-    populateCryptoGraph(routes, vertexes) {
-        this.graph = new jsgraphs.WeightedDiGraph(vertexes.length);
+    populate(vertexes, routes) {
+        // V. Number of vertices, E. Number of edges
+        this.vertexes = vertexes;
+        this.V = vertexes.length;
+        this.E = routes.length;
+        // graph is represented as an array of edges.
+        this.edges = [];
 
         for (const element of routes) {
             const tokenPair = element["tokens"];
             const route = element["route"];
-
-            const firstTokenIndex = vertexes.indexOf(tokenPair[0]);
-            const secondTokenIndex = vertexes.indexOf(tokenPair[1]);
-            this.graph.node(firstTokenIndex).label = tokenPair[0];
-            this.graph.node(secondTokenIndex).label = tokenPair[1];
-
             const weight = -Math.log(route.midPrice.toSignificant(6));
-            this.graph.addEdge(new jsgraphs.Edge(firstTokenIndex, secondTokenIndex, weight));
+            
+            this.edges.push(new Edge(tokenPair[0], tokenPair[1], weight));
         }
-
-        console.log(this.graph);
     }
 
-    detectArbitrage() {
-        let bf = new jsgraphs.BellmanFord(this.graph, 0);
-        bf.run();
+    detectArbitrage(src) {
+        // Finds a negative cycle using Bellman-Ford algorithm.
+        this.dist = new Map();
+        this.parent = new Map();
 
-        for(var v = 1; v < this.graph.V+1; ++v){
-            if(bf.hasPathTo(v)){
-                var path = bf.pathTo(v);
-                console.log('=====path from 0 to ' + v + ' start==========');
-                for(var i = 0; i < path.length; ++i) {
-                    var e = path[i];
-                    console.log(e.from() + ' => ' + e.to() + ': ' + e.weight);
+        // Initialize distances from src to all other vertices as INFINITE and all parent as -1
+        for (const vertex in this.vertexes) {
+            this.dist[vertex] = Number.MAX_VALUE;
+            this.parent[vertex] = -1;
+        }
+        this.dist[src] = 0;
+
+        // Relax all edges |this.V| - 1 times.
+        for (var i = 1; i < this.V; i++) {
+            for (var j = 0; j < this.E; j++) {
+                var u = this.edges[j].src;
+                var v = this.edges[j].dest;
+                var weight = this.edges[j].weight;
+                if (this.dist[u] != Number.MAX_VALUE && this.dist[u] + weight < this.dist[v]) {
+                    this.dist[v] = this.dist[u] + weight;
+                    this.parent[v] = u;
                 }
-                console.log('=====path from 0 to ' + v + ' end==========');
-                console.log('=====distance: '  + bf.distanceTo(v) + '=========');
             }
         }
 
-        bf.run(bf.V + 1);
-        for(var v = 1; v < this.graph.V+1; ++v){
-            if(bf.hasPathTo(v)){
-                var path = bf.pathTo(v);
-                console.log('=====path from 0 to ' + v + ' start==========');
-                for(var i = 0; i < path.length; ++i) {
-                    var e = path[i];
-                    console.log(e.from() + ' => ' + e.to() + ': ' + e.weight);
-                }
-                console.log('=====path from 0 to ' + v + ' end==========');
-                console.log('=====distance: '  + bf.distanceTo(v) + '=========');
+        // Check for negative-weight cycles
+        var C = -1;
+        for (var i = 0; i < this.E; i++) {
+            var u = this.edges[i].src;
+            var v = this.edges[i].dest;
+            var weight = this.edges[i].weight;
+            if (this.dist[u] != Number.MAX_VALUE && this.dist[u] + weight < this.dist[v]) {
+                // Store one of the vertex of the negative weight cycle
+                C = v;
+                break;
             }
+        }
+
+        if (C != -1) {
+            for (var i = 0; i < this.V; i++)
+                C = this.parent[C];
+            // To store the cycle vertex
+            var cycle = [];
+            for (var v = C;; v = this.parent[v]) {
+                cycle.push(v);
+                if (v == C && cycle.length > 1)
+                    break;
+            }
+            // Reverse cycle[]
+            cycle.reverse();
+            // Printing the negative cycle
+            for(var v of cycle) console.log(v + " -> ");
+            console.log("");
+        }
+        else {
+            console.log(-1);
         }
     }
 }
 
-module.exports = Grapher
+module.exports = UniswapGraph
