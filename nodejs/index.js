@@ -240,9 +240,7 @@ const main = async () => {
         await getRoutes(tokensJson).then(response => {
             routes = response;
         });
-    }
-
-    provider.destroy();
+    } 
 }
 
 
