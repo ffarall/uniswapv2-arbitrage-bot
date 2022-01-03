@@ -228,6 +228,10 @@ const main = async () => {
 
                     } else {
                         console.log(`Arbitrage found but with low gain. Will not be considered.`);
+                        console.log("");
+                        console.log("");
+                        console.log("");
+                        console.log("");
                     }
                 }
             }
