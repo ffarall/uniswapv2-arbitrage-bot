@@ -15,3 +15,6 @@
 
 ## How to run
 Open the terminal inside `nodejs` folder and run `node index.js`. The program is in an infinite loop searching for arbitrages, and to stop it, use the keyboard shortcut Ctrl + C.
+
+## Example of program working
+<img src="example.gif"/>
