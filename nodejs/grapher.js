@@ -163,4 +163,4 @@ class UniswapGraph {
     }
 }
 
-module.exports = UniswapGraph
+module.exports = UniswapGraph;
