@@ -13,6 +13,13 @@
 
     - `auxTokens.json`: Full list of tokens' addresses (backup in case `tokens.json` is modified to work with less tokens).
 
+## Dependencies
+This repo depends on [ethers](https://github.com/Uniswap/v3-sdk) and [Uniswap SDK V3](https://github.com/Uniswap/v3-sdk). To add them, open the terminal at `nodejs` folder and run:
+```
+npm install ethers
+npm install @uniswap/sdk
+```
+
 ## How to run
 Open the terminal inside `nodejs` folder and run `node index.js`. The program is in an infinite loop searching for arbitrages, and to stop it, use the keyboard shortcut Ctrl + C.
 
