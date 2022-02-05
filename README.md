@@ -1,6 +1,9 @@
 # uniswapv2-arbitrage-bot
  Simple cryptocurrency arbitrage bot working with Uniswap V2 DEX.
 
+## Disclaimer
+This bot implements a very simple arbitrage strategy, which almost all the time won't produce actual earnings. Don't use it expecting to earn a lot of money.
+
 ## Repo structure
 - `nodejs`: Includes the NodeJS project for the bot with all it's dependencies and source files.
     - `index.js`: Main file. Contains all the methods related to communicating with the Uniswap SDK as well as the main loop. Some of it's main functions include retrieving information of the pairs of tokens the bot works with, filtering pairs by liquidity of the pools and calculating slippage for a trade.
